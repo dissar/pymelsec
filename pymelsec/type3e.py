@@ -98,12 +98,10 @@ class Type3E:
         try:
             self.close()
         except:
-            self.__log.exception("Error closing connection.")
             return False
         else:
             if not exc_type:
                 return True
-            self.__log.exception("Unhandled Client Error", exc_info=(exc_type, exc_val, exc_tb))
             return False
 
 
