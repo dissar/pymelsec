@@ -133,7 +133,6 @@ class MCError(Exception):
     """
 
     def __init__(self, errorcode: int) -> None:
-        # self.errorcode =  f'0x{str(errorcode).rjust(4, "0").upper()}'
         self.errorcode = errorcode
 
     def errorcode_as_hex(self) -> str:
