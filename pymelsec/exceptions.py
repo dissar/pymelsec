@@ -22,15 +22,15 @@ class MCError(Exception):
         # page 42 of developer guide
         if self.errorcode >= 0x4000 and self.errorcode <= 0x4FFF:
             return f'{self.errorcode_as_hex()}: Errors detected by the CPU module.'
-        elif self.errorcode == 0x0050:
-            return (f'{self.errorcode_as_hex()}: When "Communication Data Code" is set to'
-            'ASCII Code, ASCII code data that cannot be converted to binary were received.')
-        elif self.errorcode >= 0x0051 and self.errorcode <= 0x0054:
-            return (f'{self.errorcode_as_hex()}: The number of read or write points is '
-            'outside the allowable range.')
         elif self.errorcode == 0x0055:
             return (f'{self.errorcode_as_hex()}: Although online change is disabled, the connected '
             'device requested the RUN-state CPU module for data writing.')
+        elif self.errorcode == 0xC050:
+            return (f'{self.errorcode_as_hex()}: When "Communication Data Code" is set to'
+            'ASCII Code, ASCII code data that cannot be converted to binary were received.')
+        elif self.errorcode >= 0xC051 and self.errorcode <= 0xC054:
+            return (f'{self.errorcode_as_hex()}: The number of read or write points is '
+            'outside the allowable range.')
         elif self.errorcode == 0xC056:
             return f'{self.errorcode}: The read or write request exceeds the maximum address.'
         elif self.errorcode == 0xC058:
