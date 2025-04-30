@@ -2,6 +2,127 @@
 This file is a collection of MELSEC Communication error.
 """
 
+# page 42 of developer guide https://dl.mitsubishielectric.com/dl/fa/document/manual/plc/sh080891eng/sh080891engs.pdf)
+MC_ERROR_DETAILS = {
+    # 0x4000 to 0x4FFF
+    **dict.fromkeys(range(0x4000, 0x5000), {
+        "description": "Errors detected by the CPU module (Errors occurred in other than MC protocol communication)",
+        "action": [
+            "Refer to the MELSEC-L CPU Module User's Manual (Hardware Design, Maintenance and Inspection)."
+        ]
+    }),
+    0x0055: {
+        "description": "Although online change is disabled, the connected device requested the RUN-state CPU module for data writing.",
+        "action": [
+            "Before enabling online change, write the data.",
+            "Change the operating status of the CPU module to STOP and write the data."
+        ]
+    },
+    0xC050: {
+        "description": 'When "Communication Data Code" is set to ASCII Code, ASCII code data that cannot be converted to binary were received.',
+        "action": [
+            "Select Binary Code for 'Communication Data Code', and restart the CPU module.",
+            "Correct the send data of the connected device and resend the data."
+        ]
+    },
+    # 0xC051 to 0xC054
+    **dict.fromkeys(range(0xC051, 0xC055), {
+        "description": "The number of read or write points is outside the allowable range.",
+        "action": [
+            "Correct the number of read or write points.",
+            "Resend the data to the CPU module."
+        ]
+    }),
+    0xC055: {
+        "description": "Although online change is disabled, the connected device requested data writing.",
+        "action": [
+            "Before enabling online change, write the data.",
+            "Change the CPU module to STOP and write the data."
+        ]
+    },
+    0xC056: {
+        "description": "The read or write request exceeds the maximum address.",
+        "action": [
+            "Correct the start address or the number of read/write points.",
+            "The maximum address must not be exceeded."
+        ]
+    },
+    0xC058: {
+        "description": "Request data length mismatch after ASCII-to-binary conversion.",
+        "action": ["Check and correct the text or request data length."]
+    },
+    0xC059: {
+        "description": "Command and/or subcommand are specified incorrectly.",
+        "action": ["Check the request.", "Use supported command/subcommand."]
+    },
+    0xC05B: {
+        "description": "The CPU module could not access the specified device.",
+        "action": ["Check the device to be read or written."]
+    },
+    0xC05C: {
+        "description": "The request data is incorrect (e.g. bit-to-word device mismatch).",
+        "action": ["Correct the request data and resend it."]
+    },
+    0xC05D: {
+        "description": "No monitor registration.",
+        "action": ["Perform monitor registration before monitoring."]
+    },
+    0xC05F: {
+        "description": "Request cannot be executed to the CPU module.",
+        "action": [
+            "Correct the network number, PC number, or module I/O/station number."
+        ]
+    },
+    0xC060: {
+        "description": "Incorrect specification of bit devices.",
+        "action": ["Correct and resend the request data."]
+    },
+    0xC061: {
+        "description": "Data length mismatch in character area.",
+        "action": [
+            "Check and correct the text data or request data length."
+        ]
+    },
+    0xC06F: {
+        "description": "Request sent in mismatched communication format (ASCII/Binary).",
+        "action": [
+            "Send request in format matching 'Communication Data Code'.",
+            "Change the setting to match the request message."
+        ]
+    },
+    0xC070: {
+        "description": "Device memory extension not allowed for target station.",
+        "action": [
+            "Access device memory without specifying the extension."
+        ]
+    },
+    0xC0B5: {
+        "description": "The CPU module cannot handle the specified data.",
+        "action": [
+            "Correct the request data.",
+            "Stop the current request."
+        ]
+    },
+    0xC200: {
+        "description": "The remote password is incorrect.",
+        "action": [
+            "Correct the remote password, then unlock and lock again."
+        ]
+    },
+    0xC201: {
+        "description": "Port is locked due to remote password.",
+        "action": [
+            "Unlock the remote password before communication."
+        ]
+    },
+    0xC204: {
+        "description": "Unlock request came from a different device.",
+        "action": [
+            "Retry lock processing from the original requesting device."
+        ]
+    }
+}
+
 class MCError(Exception):
     """
     Device code error
@@ -19,63 +140,13 @@ class MCError(Exception):
         return f'0x{str(self.errorcode).rjust(4, "0").upper()}'
 
     def __str__(self):
-        # page 42 of developer guide
-        if self.errorcode >= 0x4000 and self.errorcode <= 0x4FFF:
-            return f'{self.errorcode_as_hex()}: Errors detected by the CPU module.'
-        elif self.errorcode == 0x0055:
-            return (f'{self.errorcode_as_hex()}: Although online change is disabled, the connected '
-            'device requested the RUN-state CPU module for data writing.')
-        elif self.errorcode == 0xC050:
-            return (f'{self.errorcode_as_hex()}: When "Communication Data Code" is set to'
-            'ASCII Code, ASCII code data that cannot be converted to binary were received.')
-        elif self.errorcode >= 0xC051 and self.errorcode <= 0xC054:
-            return (f'{self.errorcode_as_hex()}: The number of read or write points is '
-            'outside the allowable range.')
-        elif self.errorcode == 0xC056:
-            return f'{self.errorcode}: The read or write request exceeds the maximum address.'
-        elif self.errorcode == 0xC058:
-            return (f'{self.errorcode_as_hex()}: The request data length after ASCII-to-binary conversion '
-            'does not match the data size of the character area (a part of text data).')
-        elif self.errorcode == 0xC059:
-            return (f'{self.errorcode_as_hex()}:  The command and/or subcommand are specified incorrectly. '
-            'The CPU module does not support the command and/or subcommand.')
-        elif self.errorcode == 0xC05B:
-            return (f'{self.errorcode_as_hex()}: The CPU module cannot read data from or write data to the '
-            'specified device.')
-        elif self.errorcode == 0xC05C:
-            return (f'{self.errorcode_as_hex()}: The request data is incorrect. (e.g. reading or writing data '
-            'in units of bits from or to a word device)')
-        elif self.errorcode == 0xC05D:
-            return f'{self.errorcode}: No monitor registration'
-        elif self.errorcode == 0xC05F:
-            return f'{self.errorcode}: The request cannot be executed to the CPU module.'
-        elif self.errorcode == 0xC060:
-            return (f'{self.errorcode_as_hex()}: The request data is incorrect. (ex. incorrect specification '
-            'of data for bit devices)')
-        elif self.errorcode == 0xC061:
-            return (f'{self.errorcode_as_hex()}: The request data length does not match the number of data in '
-            'the character area (a part of text data).')
-        elif self.errorcode == 0xC06F:
-            return (f'{self.errorcode_as_hex()}: The CPU module received a request message in ASCII format when '
-            '"Communication Data Code is set to Binary Code, or received it in '
-            'binary format when the setting is set to ASCII Code. (This error code '
-            'is only registered to the error history, and no abnormal response is '
-            'returned.)')
-        elif self.errorcode == 0xC070:
-            return (f'{self.errorcode_as_hex()}: The device memory extension cannot be specified for the '
-            'target station.')
-        elif self.errorcode == 0xC0B5:
-            return f'{self.errorcode}: The CPU module cannot handle the data specified.'
-        elif self.errorcode == 0xC200:
-            return f'{self.errorcode}: The remote password is incorrect.'
-        elif self.errorcode == 0xC201:
-            return (f'{self.errorcode_as_hex()}: The port used for communication is locked with the remote '
-            'password. Or, because of the remote password lock status with '
-            '"Communication Data Code" set to ASCII Code, the subcommand '
-            'and later part cannot be converted to a binary code.')
-        elif self.errorcode == 0xC204:
-            return (f'{self.errorcode_as_hex()}: The connected device is different from the one that requested for '
-            'unlock processing of the remote password.')
+        entry = MC_ERROR_DETAILS.get(self.errorcode, None)
+        if entry is None:
+            return f'Unknown error code: {self.errorcode_as_hex()}'
+        else:
+            description = entry["description"]
+            action = "\n".join(entry["action"])
+            return f'{self.errorcode_as_hex()}\nDescription: {description}\nAction: {action}'
 
 
 class DataTypeError(Exception):
