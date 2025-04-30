@@ -20,7 +20,9 @@ class MCError(Exception):
 
     def __str__(self):
         # page 42 of developer guide
-        if self.errorcode == 0x0050:
+        if self.errorcode >= 0x4000 and self.errorcode <= 0x4FFF:
+            return f'{self.errorcode_as_hex()}: Errors detected by the CPU module.'
+        elif self.errorcode == 0x0050:
             return (f'{self.errorcode_as_hex()}: When "Communication Data Code" is set to'
             'ASCII Code, ASCII code data that cannot be converted to binary were received.')
         elif self.errorcode >= 0x0051 and self.errorcode <= 0x0054:
