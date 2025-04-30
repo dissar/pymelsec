@@ -11,65 +11,68 @@ class MCError(Exception):
         devicename(str):    devicename. (ex: "Q", "P", both of them does not support mcprotocol.)
     """
 
-    def __init__(self, errorcode):
-        self.errorcode =  f'0x{str(errorcode).rjust(4, "0").upper()}'
+    def __init__(self, errorcode: int) -> None:
+        # self.errorcode =  f'0x{str(errorcode).rjust(4, "0").upper()}'
+        self.errorcode = errorcode
 
+    def errorcode_as_hex(self) -> str:
+        return f'0x{str(self.errorcode).rjust(4, "0").upper()}'
 
     def __str__(self):
         # page 42 of developer guide
         if self.errorcode == 0x0050:
-            return (f'{self.errorcode}: When "Communication Data Code" is set to'
+            return (f'{self.errorcode_as_hex()}: When "Communication Data Code" is set to'
             'ASCII Code, ASCII code data that cannot be converted to binary were received.')
         elif self.errorcode >= 0x0051 and self.errorcode <= 0x0054:
-            return (f'{self.errorcode}: The number of read or write points is '
+            return (f'{self.errorcode_as_hex()}: The number of read or write points is '
             'outside the allowable range.')
         elif self.errorcode == 0x0055:
-            return (f'{self.errorcode}: Although online change is disabled, the connected '
+            return (f'{self.errorcode_as_hex()}: Although online change is disabled, the connected '
             'device requested the RUN-state CPU module for data writing.')
         elif self.errorcode == 0xC056:
             return f'{self.errorcode}: The read or write request exceeds the maximum address.'
         elif self.errorcode == 0xC058:
-            return (f'{self.errorcode}: The request data length after ASCII-to-binary conversion '
+            return (f'{self.errorcode_as_hex()}: The request data length after ASCII-to-binary conversion '
             'does not match the data size of the character area (a part of text data).')
         elif self.errorcode == 0xC059:
-            return (f'{self.errorcode}:  The command and/or subcommand are specified incorrectly. '
+            return (f'{self.errorcode_as_hex()}:  The command and/or subcommand are specified incorrectly. '
             'The CPU module does not support the command and/or subcommand.')
         elif self.errorcode == 0xC05B:
-            return (f'{self.errorcode}: The CPU module cannot read data from or write data to the '
+            return (f'{self.errorcode_as_hex()}: The CPU module cannot read data from or write data to the '
             'specified device.')
         elif self.errorcode == 0xC05C:
-            return (f'{self.errorcode}: The request data is incorrect. (e.g. reading or writing data '
+            return (f'{self.errorcode_as_hex()}: The request data is incorrect. (e.g. reading or writing data '
             'in units of bits from or to a word device)')
         elif self.errorcode == 0xC05D:
             return f'{self.errorcode}: No monitor registration'
         elif self.errorcode == 0xC05F:
             return f'{self.errorcode}: The request cannot be executed to the CPU module.'
         elif self.errorcode == 0xC060:
-            return (f'{self.errorcode}: The request data is incorrect. (ex. incorrect specification '
+            return (f'{self.errorcode_as_hex()}: The request data is incorrect. (ex. incorrect specification '
             'of data for bit devices)')
         elif self.errorcode == 0xC061:
-            return (f'{self.errorcode}: The request data length does not match the number of data in '
+            return (f'{self.errorcode_as_hex()}: The request data length does not match the number of data in '
             'the character area (a part of text data).')
         elif self.errorcode == 0xC06F:
-            return (f'{self.errorcode}: The CPU module received a request message in ASCII format when '
+            return (f'{self.errorcode_as_hex()}: The CPU module received a request message in ASCII format when '
             '"Communication Data Code is set to Binary Code, or received it in '
             'binary format when the setting is set to ASCII Code. (This error code '
             'is only registered to the error history, and no abnormal response is '
             'returned.)')
         elif self.errorcode == 0xC070:
-            return (f'{self.errorcode}: The device memory extension cannot be specified for the '
+            return (f'{self.errorcode_as_hex()}: The device memory extension cannot be specified for the '
             'target station.')
         elif self.errorcode == 0xC0B5:
             return f'{self.errorcode}: The CPU module cannot handle the data specified.'
         elif self.errorcode == 0xC200:
             return f'{self.errorcode}: The remote password is incorrect.'
         elif self.errorcode == 0xC201:
-            return (f'{self.errorcode}: The port used for communication is locked with the remote '
+            return (f'{self.errorcode_as_hex()}: The port used for communication is locked with the remote '
             'password. Or, because of the remote password lock status with '
             '"Communication Data Code" set to ASCII Code, the subcommand '
             'and later part cannot be converted to a binary code.')
         elif self.errorcode == 0xC204:
-            return (f'{self.errorcode}: The connected device is different from the one that requested for '
+            return (f'{self.errorcode_as_hex()}: The connected device is different from the one that requested for '
             'unlock processing of the remote password.')
 
 
